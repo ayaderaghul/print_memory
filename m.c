@@ -1,78 +1,89 @@
-#include <stdio.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   m.c                                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lnguyen <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/09/06 08:50:44 by lnguyen           #+#    #+#             */
+/*   Updated: 2018/09/06 11:08:03 by lnguyen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
+
 void ft_putchar(char c)
 {
 	write(1,&c,1);
 }
 
-const char *hexa = "0123456789abcdef";
-
 int digits(int n)
 {
-    int i;
-    i = 1;
-    while (n > 15)
-    {
-        n = n/16;
-        ++i;
-    }
-    return (i);
+	int i;
+	i = 1;
+	while (n > 15)
+	{
+		n = n/16;
+		++i;
+	}
+	return (i);
 }
 
-void convert_to_hex_s(int n)
+const char *hexa = "0123456789abcdef";
+
+void init(char *array, int size)
 {
-	if (n > 15)
-		convert_to_hex_s(n/16);
-	ft_putchar(hexa[n%16]);
+	int i;
+	i = 0;
+	while (i < size)
+	{
+		if (i == 4 || i == 9)
+			array[i] = ' ';
+		else
+			array[i] = '0';
+		++i;
+	}
 }
 
-void convert_to_hex(int n, int i)
+void convert_to_hex(int n, char *array)
 {
-    if (n > 15)
-    {
-        i++;
-        convert_to_hex(n/16, i);
-    }
-    if (i == 1)
-        ft_putchar(' ');
-    ft_putchar(hexa[n%16]);
-    ++i;
+	int r = 0;
+	int d = 0;
+	d = digits(n);
+	int i = d - 1;
+	while (n > 15)
+	{
+		if (i == 4)
+		{
+			i++;
+			r = n%16;
+			array[i] = hexa[r];
+			n = n / 16;
+			i = i - 2;
+		}
+		else
+		{
+			r = n%16;
+			array[i] = hexa[r];
+			n = n / 16;
+			i--;
+		}
+
+	}
+	array[i] = hexa[n];
 }
 
-void print_hex(int n)
+void print_array(char *array, int size)
 {
-    int i = 0;
-	i = digits(n);
-	if (i < 5)
-		convert_to_hex_s(n);
-	else
-		convert_to_hex(n,0);
-	if (i < 5)
-    {
-        while (i < 10)
-        {
-            if (i == 4 || i == 9)
-                ft_putchar(' ');
-            else
-                ft_putchar('0');
-            ++i;
-        }
-    }
-    else
-    {
-        ++i;
-        while (i < 10)
-        {
-            if (i == 9)
-                ft_putchar(' ');
-            else
-                ft_putchar('0');
-            ++i;
-        }
-    }
+	int i = 0;
+	while (i < size)
+	{
+		ft_putchar(array[i]);
+		++i;
+	}
 }
 
-void print_hex_space()
+void print_space()
 {
 	int i;
 	i = 0;
@@ -83,67 +94,74 @@ void print_hex_space()
 	}
 }
 
-void ft_putnbr(int n)
-{
-	if (n > 9)
-	{
-		ft_putnbr(n/10);
-		ft_putnbr(n%10);
-	}
-	else
-		ft_putchar(n+'0');
-}
-
 void print_ascii(int n)
 {
-
-//	ft_putnbr(n);
-	if (32 <= n && n <= 126)
+	if (32 <= n && n <=126)
 		ft_putchar(n);
 	else
 		ft_putchar('.');
-
 }
+
+void print_hex(int n, char *array)
+{
+	convert_to_hex(n,array);
+	print_array(array,10);
+	init(array,10);
+}
+
+
 
 void print_memory(const void *addr, size_t size)
 {
-	size_t i;
-	size_t j;
-	size_t k;
-	size_t l;
-	size_t m = size/4;
-	i = 0;
-	j = 0;
-	k = 0;
-	l = 0;
 
-	while (i < m && k < size)
+	char array[10];
+	init(array,10);
+	int n = 0;
+	size_t i = 0;
+	size_t j = 0;
+	size_t k = 0;
+	size_t l = 0;
+	size_t length = size/4;
+
+	int *str;
+	str = (int*)addr;
+
+	while (i < length)
 	{
 		i = j;
 		j = i + 4;
 		while (i < j)
 		{
-			if (i < m)
-				print_hex(*((int*)addr + i));
+			if (i < length)
+			{
+				n = *(str+i);
+				print_hex(n, array);
+			}
 			else
-				print_hex_space();
+				print_space();
 			++i;
 		}
 		k = l;
-		l = k + 16;
-		while (k < l && k < size)
+		l = k + 4;
+		while (k < l)
 		{
-			print_ascii(*((int*)addr + i));
+			if (k < length)
+			{
+				n = *(str+k);
+				print_ascii(n);
+				write(1,"...",3);
+			}
 			++k;
 		}
 		ft_putchar('\n');
 	}
 }
 
+/*
 int main()
 {
-	int  tab[10] = {0,23,150,255,12,16,42,103};
+	int tab[10] = {0,23,150,255,12,16,42,103};
 	print_memory(tab, sizeof(tab));
-//	printf("%lu\n",sizeof(tab));
 	return 0;
 }
+*/

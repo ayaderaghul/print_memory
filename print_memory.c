@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   print_memory.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lnguyen <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/09/04 22:52:00 by lnguyen           #+#    #+#             */
+/*   Updated: 2018/09/06 08:48:45 by lnguyen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdio.h>
 #include <unistd.h>
 void ft_putchar(char c)
@@ -39,7 +51,7 @@ void convert_to_hex(int n, int i)
     ++i;
 }
 
-int print_hex(int n)
+void print_hex(int n)
 {
     int i = 0;
 	i = digits(n);
@@ -70,15 +82,17 @@ int print_hex(int n)
             ++i;
         }
     }
-    return 0;
 }
 
-void print_ascii(int n)
+void print_hex_space()
 {
-	if (32 <= n && n <= 126)
-		ft_putchar(n);
-	else
-		ft_putchar('.');
+	int i;
+	i = 0;
+	while (i < 10)
+	{
+		ft_putchar(' ');
+		++i;
+	}
 }
 
 void ft_putnbr(int n)
@@ -92,6 +106,20 @@ void ft_putnbr(int n)
 		ft_putchar(n+'0');
 }
 
+void print_ascii(int n)
+{
+
+//	printf("%d ",n);
+
+//	ft_putnbr(n);
+//	ft_putchar(' ');
+	if (32 <= n && n <= 126)
+		ft_putchar(n);
+	else
+		ft_putchar('.');
+
+}
+
 void print_memory(const void *addr, size_t size)
 {
 	size_t i;
@@ -99,25 +127,34 @@ void print_memory(const void *addr, size_t size)
 	size_t k;
 	size_t l;
 	size_t m = size/4;
-
 	i = 0;
+	j = 0;
 	k = 0;
+	l = 0;
 
 	while (i < m && k < size)
 	{
+		i = j;
 		j = i + 4;
-l = k + 
-		print_hex(*((int*)addr + i));
-		
-		++i;
-	}
-	while (i < size)
-	{
-		print_ascii(*((int*)addr + i));
-		++i;
+		while (i < j)
+		{
+			if (i < m)
+				print_hex(*((int*)addr + i));
+			else
+				print_hex_space();
+			++i;
+		}
+		k = l;
+		l = k + 16;
+		while (k < l && k < size)
+		{
+			print_ascii(*((int*)addr + k));
+			++k;
+		}
+		ft_putchar('\n');
 	}
 }
-
+/*
 int main()
 {
 	int  tab[10] = {0,23,150,255,12,16,42,103};
@@ -125,3 +162,5 @@ int main()
 //	printf("%lu\n",sizeof(tab));
 	return 0;
 }
+
+*/
