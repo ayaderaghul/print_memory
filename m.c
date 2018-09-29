@@ -45,7 +45,14 @@ void init(char *array, int size)
 	}
 }
 
-void convert_to_hex(int n, char *array)
+void init2(char *array2, int size)
+{
+  int i = 0;
+  while (i < size)
+    array2[i++] = '0';
+}
+
+int convert_to_hex(int n, char *array, char *array2, int j)
 {
 	int r = 0;
 	int d = 0;
@@ -71,6 +78,19 @@ void convert_to_hex(int n, char *array)
 
 	}
 	array[i] = hexa[n];
+	i = 0;
+	while (i < 9)
+	  {
+	    if (i == 4)
+	      ++i;
+	    else
+	      {
+		array2[j] = array[i];
+		++i;
+		++j;
+	      }
+	  }
+	return j;
 }
 
 void print_array(char *array, int size)
@@ -96,24 +116,34 @@ void print_space()
 
 void print_ascii(int n)
 {
-	if (32 <= n && n <=126)
-		ft_putchar(n);
-	else
-		ft_putchar('.');
+  if (32 <= n && n <=126)
+    ft_putchar(n);
+  else
+    ft_putchar('.');
 }
 
-void print_hex(int n, char *array)
+void print_hex(int n, char *array, char *array2, int j)
 {
-	convert_to_hex(n,array);
-	print_array(array,10);
-	init(array,10);
+  convert_to_hex(n,array,array2,j);
+  print_array(array,10);
+  init(array,10);
 }
 
-
-
+int hex_dec(char c)
+{
+  int i = 0;
+  while (i < 16)
+    {
+      if (c == hexa[i])
+	return i;
+      ++i;
+    }
+  return -1;
+}
+	  
+#include <stdio.h>
 void print_memory(const void *addr, size_t size)
 {
-
 	char array[10];
 	init(array,10);
 	int n = 0;
@@ -122,10 +152,11 @@ void print_memory(const void *addr, size_t size)
 	size_t k = 0;
 	size_t l = 0;
 	size_t length = size/4;
-
+	char array2[length * 8];
+	init2(array2, length * 8);
 	int *str;
 	str = (int*)addr;
-
+	int m = 0;
 	while (i < length)
 	{
 		i = j;
@@ -135,23 +166,20 @@ void print_memory(const void *addr, size_t size)
 			if (i < length)
 			{
 				n = *(str+i);
-				print_hex(n, array);
+				print_hex(n, array, array2, i * 8);
 			}
 			else
 				print_space();
 			++i;
 		}
 		k = l;
-		l = k + 4;
-		while (k < l)
+		l = k + 32;
+		while (k < l && k < length * 8)
 		{
-			if (k < length)
-			{
-				n = *(str+k);
-				print_ascii(n);
-				write(1,"...",3);
-			}
-			++k;
+		  m = hex_dec(array2[k]) * 10 + hex_dec(array2[k + 1]);
+		  printf("m: %d\n",m);
+		  print_ascii(m);
+		  k = k + 2;
 		}
 		ft_putchar('\n');
 	}
